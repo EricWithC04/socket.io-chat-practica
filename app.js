@@ -27,11 +27,20 @@ io.on("connection", (socket) => {
         socket.id = name
     })
     socket.broadcast.emit("hi")
+
+    socket.on("write", () => {
+        io.emit("write", { name: socket.id })
+    })
+
+    socket.on("noWrite", () => {
+        io.emit("noWrite")
+    })
+
     socket.on('chat message', (msg) => {
         io.emit("chat message", { name: socket.id, msg })
         messages.push({ name: socket.id, msg })
         // console.log('message: ' + socket.id + ": " + msg);
-        console.log(messages);
+        // console.log(messages);
     });
     socket.on("disconnect", () => {
         console.log("usuario desconectado!");

@@ -21,6 +21,7 @@
           <input type="submit">Send</input>
         </form>
         <ul id="messages"></ul>
+        <p id="writing"></p>
         <form id="form" action="">
           <input id="input" autocomplete="off" /><button>Send</button>
         </form>
@@ -34,6 +35,7 @@
           let messages = document.getElementById("messages")
           let nameForm = document.getElementById("name_form")
           let name = document.getElementById("name")
+          let writing = document.getElementById("writing")
 
           nameForm.addEventListener("submit", (e) => {
             e.preventDefault();
@@ -42,10 +44,19 @@
             input.value = "";
           })
 
+          form.addEventListener("keydown", (e) => {
+            if (e.code !== "Enter") {
+              socket.emit("write")
+
+            }
+          })
+
           form.addEventListener('submit', (e) => {
             e.preventDefault();
             if (input.value) {
               socket.emit('chat message', input.value);
+              writing.innerText = ""
+              socket.emit("noWrite")
               input.value = '';
             }
           });
@@ -60,6 +71,16 @@
               window.scrollTo(0, document.body.scrollHeight);
             }
           });
+
+          socket.on("write", (user) => {
+            if (writing.innerText === "") {
+              writing.innerText += `${user.name} esta escribiendo...`
+            }
+          })
+          
+          socket.on("noWrite", () => {
+            writing.innerText += ""
+          })
 
           socket.on('chat message', function({ msg, name }) {
             var item = document.createElement('li');
